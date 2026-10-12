@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>PROYECTO BULD · POEMAS · IMAGINACION ACTIVA · DANIEL REMESEIRO</title>
+  <style>
+    /* ==========================================
+       1. ESTILOS BASE Y PANTALLA (WEB VIEWER)
+       ========================================== */
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    html, body {
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: "Georgia", "Didot", serif;
+      background-color: #f4f4f4;
+      color: #000000;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      counter-reset: pageCounter;
+    }
+
+    .a4-page {
+      width: 210mm;
+      height: 297mm;
+      position: relative;
+      margin: 20px auto;
+      background-color: #fcfcfc;
+      padding: 18mm 20mm 15mm 20mm;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      counter-increment: pageCounter;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .a4-page::after {
+      content: "Pág. " counter(pageCounter);
+      position: absolute;
+      bottom: 6mm;
+      right: 20mm;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      font-size: 7.5pt;
+      color: #222222;
+    }
+
+    .a4-page.cover-page::after {
+      display: none;
+    }
+
+    /* ESTILOS DE CONTENIDO */
+    .cover-header { margin-top: 5mm; text-align: center; }
+    .cover-project-tag { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 9pt; letter-spacing: 5px; text-transform: uppercase; color: #111111; margin-bottom: 4mm; font-weight: bold; }
+    .cover-main-title { font-size: 22pt; letter-spacing: 4px; text-transform: uppercase; font-weight: bold; color: #000000; margin-bottom: 4mm; line-height: 1.3; }
+    .cover-subtitle { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 10pt; letter-spacing: 4px; color: #111111; font-weight: bold; }
+    .cover-divider { width: 35px; height: 1.5px; background-color: #000000; margin: 6mm auto; }
+    .cover-statement-block { max-width: 155mm; margin: 0 auto; text-align: center; }
+    .cover-statement-header { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 8.5pt; letter-spacing: 3px; text-transform: uppercase; color: #000000; margin-bottom: 4mm; font-weight: bold; }
+    .cover-statement-body { font-size: 10.5pt; line-height: 1.6; color: #000000; font-style: italic; font-weight: normal; text-align: justify; }
+    .cover-author { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 9.5pt; letter-spacing: 4px; color: #000000; margin-bottom: 4mm; text-align: center; font-weight: bold; }
+
+    .inner-header { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 8pt; letter-spacing: 3px; text-transform: uppercase; color: #000000; font-weight: bold; border-bottom: 1.5px solid #000000; padding-bottom: 3mm; text-align: left; }
+    
+    .content-wrap { 
+      width: 100%; 
+      text-align: center; 
+      margin: 3mm 0; 
+    }
+    
+    /* CONTENEDOR DE IMAGEN CON POSICIÓN RELATIVA PARA ANCLAR LA MARCA DE AGUA EN SU ESQUINA INFERIOR IZQUIERDA */
+    .image-container { 
+      position: relative; 
+      width: 100%; 
+      height: 116mm; 
+      margin: 0 auto 3mm auto;
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      cursor: pointer;
+      overflow: hidden; 
+    }
+    .image-container img { 
+      max-width: 100%; 
+      max-height: 100%; 
+      object-fit: contain; 
+      pointer-events: none;
+    }
+
+    /* MARCA DE AGUA FIJA EN EL MARGEN INFERIOR IZQUIERDO EXACTO DE LA IMAGEN */
+    .watermark { 
+      position: absolute; 
+      bottom: 2mm; 
+      left: 0mm; 
+      font-family: "Helvetica Neue", Arial, sans-serif; 
+      font-size: 7.5pt; 
+      letter-spacing: 1.5px; 
+      color: #000000; 
+      font-weight: bold;
+      pointer-events: none; 
+      z-index: 10; 
+    }
+
+    .zoom-trigger {
+      position: absolute;
+      top: 4mm;
+      right: 4mm;
+      width: 36px;
+      height: 36px;
+      background-color: rgba(0, 0, 0, 0.6);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      pointer-events: none;
+    }
+    .zoom-trigger svg { width: 18px; height: 18px; fill: #ffffff; }
+
+    .haiku-content { text-align: center; margin-top: 2mm; }
+    .haiku-number { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 8pt; letter-spacing: 4px; color: #222222; font-weight: bold; margin-bottom: 1mm; }
+    .haiku-title { font-size: 11pt; letter-spacing: 2px; text-transform: uppercase; font-weight: bold; color: #000000; margin-bottom: 2mm; }
+    .haiku-text { font-size: 12pt; line-height: 1.5; font-style: italic; color: #000000; letter-spacing: 0.5px; font-weight: normal; }
+
+    .section-title { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 8.5pt; letter-spacing: 3px; text-transform: uppercase; color: #000000; font-weight: bold; border-bottom: 1.5px solid #000000; padding-bottom: 2mm; margin-top: 2mm; margin-bottom: 2.5mm; }
+    .curatorial-text { font-size: 10pt; line-height: 1.45; color: #000000; text-align: justify; margin-bottom: 2mm; }
+    .tech-table { width: 100%; border-collapse: collapse; margin-bottom: 2mm; }
+    .tech-table td { padding: 1.5mm 0; border-bottom: 1px solid #999999; font-size: 8pt; }
+    .tech-label { font-family: "Helvetica Neue", Arial, sans-serif; text-transform: uppercase; letter-spacing: 1.5px; color: #000000; font-weight: bold; width: 35%; font-size: 7.5pt; }
+    .tech-value { color: #000000; }
+    .print-btn-container { text-align: center; margin-bottom: 2mm; }
+    .print-btn { background-color: #000000; color: #ffffff; padding: 3mm 8mm; font-family: "Helvetica Neue", Arial, sans-serif; font-size: 8pt; letter-spacing: 2px; text-transform: uppercase; border: none; cursor: pointer; font-weight: bold; }
+    
+    .inner-footer { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 7.5pt; letter-spacing: 1.5px; color: #111111; font-weight: bold; text-align: center; border-top: 1.5px solid #999999; padding-top: 3mm; }
+    .inner-footer a { color: #000000; text-decoration: none; }
+
+    /* VISOR MODAL */
+    .modal-viewer { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(12, 12, 12, 0.96); z-index: 999999; align-items: center; justify-content: center; }
+    .modal-viewer.active { display: flex !important; }
+    .modal-close { position: absolute; top: 25px; right: 30px; font-family: "Helvetica Neue", Arial, sans-serif; font-size: 22pt; color: #ffffff; cursor: pointer; z-index: 1000000; }
+    .modal-container { display: flex; align-items: center; justify-content: center; gap: 20px; width: 100%; height: 100%; padding: 20px; }
+    .modal-nav { background: none; border: none; color: #ffffff; font-size: 36pt; cursor: pointer; padding: 15px; z-index: 1000000; }
+    .modal-content-box { display: flex; flex-direction: column; align-items: center; max-width: 80vw; max-height: 85vh; }
+    .modal-img { max-width: 100%; max-height: 70vh; object-fit: contain; }
+    .modal-caption { margin-top: 15px; text-align: center; color: #ffffff; font-family: "Georgia", serif; }
+    .modal-haiku-num { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 8pt; letter-spacing: 3px; color: #aaaaaa; text-transform: uppercase; margin-bottom: 4px; }
+    .modal-haiku-title { font-size: 12pt; letter-spacing: 2px; text-transform: uppercase; }
+
+    /* ==========================================
+       2. SOLUCIÓN DEFINITIVA DE IMPRESIÓN (PDF)
+       ========================================== */
+    @media print {
+      html, body {
+        width: 210mm !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+        overflow: visible !important;
+        display: block !important;
+      }
+
+      .a4-page {
+        width: 210mm !important;
+        height: 297mm !important;
+        max-height: 297mm !important;
+        margin: 0 !important;
+        padding: 15mm 20mm 12mm 20mm !important;
+        box-shadow: none !important;
+        background-color: #ffffff !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        box-sizing: border-box !important;
+        
+        page-break-before: always !important;
+        break-before: page !important;
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+
+      .a4-page:first-child,
+      .a4-page.cover-page {
+        page-break-before: avoid !important;
+        break-before: avoid !important;
+      }
+
+      .image-container {
+        height: 110mm !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        overflow: hidden !important;
+      }
+
+      .image-container img {
+        max-height: 100% !important;
+        width: auto !important;
+      }
+
+      .print-btn-container, 
+      .zoom-trigger, 
+      .modal-viewer, 
+      .a4-page::after {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PÁGINA 1: PORTADA -->
+  <div class="a4-page cover-page">
+    <div class="cover-header">
+      <div class="cover-project-tag">PROYECTO BULD · IMAGINACIÓN ACTIVA</div>
+      <div class="cover-main-title">CONTENIDO E INCONSCIENTE</div>
+      <div class="cover-subtitle">Daniel Remeseiro</div>
+    </div>
+    <div class="cover-statement-block">
+      <div class="cover-divider"></div>
+      <div class="cover-statement-header">INTRODUCCIÓN</div>
+      <div class="cover-statement-body">
+        Para comprender este trabajo es necesario diferenciar dos dimensiones fundamentales de nuestra mente: el <strong>inconsciente</strong> y el <strong>contenido</strong>.<br><br>
+        El <strong>inconsciente</strong> es el amplio espacio invisible que está más allá de nuestra atención directa; un territorio vivo donde residen ideas, recuerdos, emociones e impulsos que no procesamos de forma consciente a diario.<br><br>
+        El <strong>contenido</strong> es la materia concreta que habita o brota de ese espacio: una imagen, un símbolo, un temor o una emoción precisa. Cuando la mente consciente se calma, este contenido busca salir a la luz.<br><br>
+        A través de la Imaginación Activa, el arte actúa como un puente sereno. Permite que el contenido del inconsciente se manifieste en formas visibles, dándole un cauce claro, armonioso y pleno de sentido a través de la imagen y la palabra.
+      </div>
+    </div>
+    <div>
+      <div class="cover-author">Daniel Remeseiro</div>
+      <div class="inner-footer">
+        <a href="mailto:dremeseiro@gmail.com">dremeseiro@gmail.com</a> | WhatsApp | <a href="https://www.danielremeseiro.es" target="_blank">www.danielremeseiro.es</a><br>
+        PROYECTO BULD · IMAGINACIÓN ACTIVA · CONTENIDO E INCONSCIENTE · <br>
+        © Daniel Remeseiro · A CORUÑA<br>
+      </div>
+    </div>
+  </div>
+
+  <!-- PÁGINAS 2 A 17 (HAIKUS I AL XVI) -->
+  <div class="a4-page">
+    <div class="inner-header">I. VACIAMIENTO DE LA CONCIENCIA · HAIKU I</div>
+    <div class="content-wrap">
+      <div class="image-container" data-index="0">
+        <img src="image1.jpg" alt="Haiku I">
+        <div class="zoom-trigger"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+        <div class="watermark">© Daniel Remeseiro</div>
+      </div>
+      <div class="haiku-content">
+        <div class="haiku-number">HAIKU I</div>
+        <div class="haiku-title">Desocupación</div>
+        <div class="haiku-text">Vacía la mente,<br>se apaga la palabra,<br>queda el espacio.</div>
+      </div>
+    </div>
+    <div class="inner-footer">
+      <a href="mailto:dremeseiro@gmail.com">dremeseiro@gmail.com</a> | WhatsApp | <a href="https://www.danielremeseiro.es" target="_blank">www.danielremeseiro.es</a><br>
+      PROYECTO BULD · IMAGINACIÓN ACTIVA · CONTENIDO E INCONSCIENTE · <br>
+      © Daniel Remeseiro · A CORUÑA<br>
+    </div>
+  </div>
+
+  <div class="a4-page">
+    <div class="inner-header">I. VACIAMIENTO DE LA CONCIENCIA · HAIKU II</div>
+    <div class="content-wrap">
+      <div class="image-container" data-index="1">
+        <img src="image2.jpg" alt="Haiku II">
+        <div class="zoom-trigger"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+        <div class="watermark">© Daniel Remeseiro</div>
+      </div>
+      <div class="haiku-content">
+        <div class="haiku-number">HAIKU II</div>
+        <div class="haiku-title">El canal limpio</div>
+        <div class="haiku-text">Cesa el juicio,<br>la mirada se limpia<br>de toda idea.</div>
+      </div>
+    </div>
+    <div class="inner-footer">
+      <a href="mailto:dremeseiro@gmail.com">dremeseiro@gmail.com</a> | WhatsApp | <a href="https://www.danielremeseiro.es" target="_blank">www.danielremeseiro.es</a><br>
+      PROYECTO BULD · IMAGINACIÓN ACTIVA · CONTENIDO E INCONSCIENTE · <br>
+      © Daniel Remeseiro · A CORUÑA<br>
+    </div>
+  </div>
+
+  <div class="a4-page">
+    <div class="inner-header">I. VACIAMIENTO DE LA CONCIENCIA · HAIKU III</div>
+    <div class="content-wrap">
+      <div class="image-container" data-index="2">
+        <img src="image3.jpg" alt="Haiku III">
+        <div class="zoom-trigger"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+        <div class="watermark">© Daniel Remeseiro</div>
+      </div>
+      <div class="haiku-content">
+        <div class="haiku-number">HAIKU III</div>
+        <div class="haiku-title">Apertura</div>
+        <div class="haiku-text">Pausa serena,<br>la atención disponible<br>sin busca alguna.</div>
+      </div>
+    </div>
+    <div class="inner-footer">
+      <a href="mailto:dremeseiro@gmail.com">dremeseiro@gmail.com</a> | WhatsApp | <a href="https://www.danielremeseiro.es" target="_blank">www.danielremeseiro.es</a><br>
+      PROYECTO BULD · IMAGINACIÓN ACTIVA · CONTENIDO E INCONSCIENTE · <br>
+      © Daniel Remeseiro · A CORUÑA<br>
+    </div>
+  </div>
+
+  <div class="a4-page">
+    <div class="inner-header">I. VACIAMIENTO DE LA CONCIENCIA · HAIKU IV</div>
+    <div class="content-wrap">
+      <div class="image-container" data-index="3">
+        <img src="image4.jpg" alt="Haiku IV">
+        <div class="zoom-trigger"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+        <div class="watermark">© Daniel Remeseiro</div>
+      </div>
+      <div class="haiku-content">
+        <div class="haiku-number">HAIKU IV</div>
+        <div class="haiku-title">Disponibilidad</div>
+        <div class="haiku-text">Blanco el instante,<br>la conciencia despeja<br>todo su centro.</div>
+      </div>
+    </div>
+    <div class="inner-footer">
+      <a href="mailto:dremeseiro@gmail.com">dremeseiro@gmail.com</a> | WhatsApp | <a href="https://www.danielremeseiro.es" target="_blank">www.danielremeseiro.es</a><br>
+      PROYECTO BULD · IMAGINACIÓN ACTIVA · CONTENIDO E INCONSCIENTE · <br>
+      © Daniel Remeseiro · A CORUÑA<br>
+    </div>
+  </div>
+
+  <div class="a4-page">
+    <div class="inner-header">II. EMERGENCIA Y AUTONOMÍA · HAIKU V</div>
+    <div class="content-wrap">
+      <div class="image-container" data-index="4">
+        <img src="image5.jpg" alt="Haiku V">
+        <div class="zoom-trigger"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+        <div class="watermark">© Daniel Remeseiro</div>
+      </div>
+      <div class="haiku-content">
+        <div class="haiku-number">HAIKU V</div>
+        <div class="haiku-title">El primer trazo</div>
+        <div class="haiku-text">Brota la forma,<br>sin pedir la licencia<br>de la razón.</div>
+      </div>
+    </div>
+    <div class="inner-footer">
+      <a href="mailto:dremeseiro@gmail.com">dremeseiro@gmail.com</a> | WhatsApp | <a href="https://www.danielremeseiro.es" target="_blank">www.danielremeseiro.es</a><br>
+      PROYECTO BULD · IMAGINACIÓN ACTIVA · CONTENIDO E INCONSCIENTE · <br>
+      © Daniel Remeseiro · A CORUÑA<br>
+    </div>
+  </div>
+
+  <div class="a4-page">
+    <div class="inner-header">II. EMERGENCIA Y AUTONOMÍA · HAIKU VI</div>
+    <div class="content-wrap">
+      <div class="image-container" data-index="5">
+        <img src="image6.jpg" alt="Haiku VI">
+        <div class="zoom-trigger"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+        <div class="watermark">© Daniel Remeseiro</div>
+      </div>
+      <div class="haiku-content">
+        <div class="haiku-number">HAIKU VI</div>
+        <div class="haiku-title">Surgimiento</div>
+        <div class="haiku-text">Luz que se mueve,<br>el impulso aparece<br>por propia mano.</div>
+      </div>
+    </div>
+    <div class="inner-footer">
+      <a href="mailto:dremeseiro@gmail.com">dremeseiro@gmail.com</a> | WhatsApp | <a href="https://www.danielremeseiro.es" target="_blank">www.danielremeseiro.es</a><br>
+      PROYECTO BULD · IMAGINACIÓN ACTIVA · CONTENIDO E INCONSCIENTE · <br>
+      © Daniel Remeseiro · A CORUÑA<br>
+    </div>
+  </div>
+
+  <div class="a4-page">
+    <div class="inner-header">II. EMERGENCIA Y AUTONOMÍA · HAIKU VII</div>
+    <div class="content-wrap">
+      <div class="image-container" data-index="6">
+        <img src="image7.jpg" alt="Haiku VII">
+        <div class="zoom-trigger"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+        <div class="watermark">© Daniel Remeseiro</div>
+      </div>
+      <div class="haiku-content">
+        <div class="haiku-number">HAIKU VII</div>
+        <div class="haiku-title">Sombra activa</div>
+        <div class="haiku-text">Cobra su vida,<br>la imagen se despliega<br>frente a la vista.</div>
+      </div>
+    </div>
+    <div class="inner-footer">
+      <a href="mailto:dremeseiro@gmail.com">dremeseiro@gmail.com</a> | WhatsApp | <a href="https://www.danielremeseiro.es" target="_blank">www.danielremeseiro.es</a><br>
+      PROYECTO BULD · IMAGINACIÓN ACTIVA · CONTENIDO E INCONSCIENTE · <br>
+      © Daniel Remeseiro · A CORUÑA<br>
+    </div>
+  </div>
+
+  <div class="a4-page">
+    <div class="inner-header">II. EMERGENCIA Y AUTONOMÍA · HAIKU VIII</div>
+    <div class="content-wrap">
+      <div class="image-container" data-index="7">
+        <img src="image8.jpg" alt="Haiku VIII">
+        <div class="zoom-trigger"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+        <div class="watermark">© Daniel Remeseiro</div>
+      </div>
+      <div class="haiku-content">
+        <div class="haiku-number">HAIKU VIII</div>
+        <div class="haiku-title">Independencia</div>
+        <div class="haiku-text">No la gobiernas,<br>se abre paso sola<br>sobre el espacio.</div>
+      </div>
+    </div>
+    <div class="inner-footer">
+      <a href="mailto:dremeseiro@gmail.com">dremeseiro@gmail.com</a> | WhatsApp | <a href="https://www.danielremeseiro.es" target="_blank">www.danielremeseiro.es</a><br>
+      PROYECTO BULD · IMAGINACIÓN ACTIVA · CONTENIDO E INCONSCIENTE · <br>
+      © Daniel Remeseiro · A CORUÑA<br>
+    </div>
+  </div>
+
+  <div class="a4-page">
+    <div class="inner-header">III. DIÁLOGO ÉTICO · HAIKU IX</div>
+    <div class="content-wrap">
+      <div class="image-container" data-index="8">
+        <img src="image9.jpg" alt="Haiku IX">
+        <div class="zoom-trigger"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+        <div class="watermark">© Daniel Remeseiro</div>
+      </div>
+      <div class="haiku-content">
+        <div class="haiku-number">HAIKU IX</div>
+        <div class="haiku-title">El encuentro</div>
+        <div class="haiku-text">Frente al espejo,<br>escuchas lo que dice<br>la forma viva.</div>
+      </div>
+    </div>
+    <div class="inner-footer">
+      <a href="mailto:dremeseiro@gmail.com">dremeseiro@gmail.com</a> | WhatsApp | <a href="https://www.danielremeseiro.es" target="_blank">www.danielremeseiro.es</a><br>
+      PROYECTO BULD · IMAGINACIÓN ACTIVA · CONTENIDO E INCONSCIENTE · <br>
+      © Daniel Remeseiro · A CORUÑA<br>
+    </div>
+  </div>
+
+  <div class="a4-page">
+    <div class="inner-header">III. DIÁLOGO ÉTICO · HAIKU X</div>
+    <div class="content-wrap">
+      <div class="image-container" data-index="9">
+        <img src="image10.jpg" alt="Haiku X">
+        <div class="zoom-trigger"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+        <div class="watermark">© Daniel Remeseiro</div>
+      </div>
+      <div class="haiku-content">
+        <div class="haiku-number">HAIKU X</div>
+        <div class="haiku-title">Presencia</div>
+        <div class="haiku-text">El Yo responde,<br>sin juzgar ni imponerse<br>a lo surgido.</div>
+      </div>
+    </div>
+    <div class="inner-footer">
+      <a href="mailto:dremeseiro@gmail.com">dremeseiro@gmail.com</a> | WhatsApp | <a href="https://www.danielremeseiro.es" target="_blank">www.danielremeseiro.es</a><br>
+      PROYECTO BULD · IMAGINACIÓN ACTIVA · CONTENIDO E INCONSCIENTE · <br>
+      © Daniel Remeseiro · A CORUÑA<br>
+    </div>
+  </div>
+
+  <div class="a4-page">
+    <div class="inner-header">III. DIÁLOGO ÉTICO · HAIKU XI</div>
+    <div class="content-wrap">
+      <div class="image-container" data-index="10">
+        <img src="image11.jpg" alt="Haiku XI">
+        <div class="zoom-trigger"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+        <div class="watermark">© Daniel Remeseiro</div>
+      </div>
+      <div class="haiku-content">
+        <div class="haiku-number">HAIKU XI</div>
+        <div class="haiku-title">Pacto</div>
+        <div class="haiku-text">Dos voluntades,<br>dialogan en el centro<br>del equilibrio.</div>
+      </div>
+    </div>
+    <div class="inner-footer">
+      <a href="mailto:dremeseiro@gmail.com">dremeseiro@gmail.com</a> | WhatsApp | <a href="https://www.danielremeseiro.es" target="_blank">www.danielremeseiro.es</a><br>
+      PROYECTO BULD · IMAGINACIÓN ACTIVA · CONTENIDO E INCONSCIENTE · <br>
+      © Daniel Remeseiro · A CORUÑA<br>
+    </div>
+  </div>
+
+  <div class="a4-page">
+    <div class="inner-header">III. DIÁLOGO ÉTICO · HAIKU XII</div>
+    <div class="content-wrap">
+      <div class="image-container" data-index="11">
+        <img src="image12.jpg" alt="Haiku XII">
+        <div class="zoom-trigger"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+        <div class="watermark">© Daniel Remeseiro</div>
+      </div>
+      <div class="haiku-content">
+        <div class="haiku-number">HAIKU XII</div>
+        <div class="haiku-title">Respeto</div>
+        <div class="haiku-text">Acepta el rasgo,<br>asumes la verdad<br>que se revela.</div>
+      </div>
+    </div>
+    <div class="inner-footer">
+      <a href="mailto:dremeseiro@gmail.com">dremeseiro@gmail.com</a> | WhatsApp | <a href="https://www.danielremeseiro.es" target="_blank">www.danielremeseiro.es</a><br>
+      PROYECTO BULD · IMAGINACIÓN ACTIVA · CONTENIDO E INCONSCIENTE · <br>
+      © Daniel Remeseiro · A CORUÑA<br>
+    </div>
+  </div>
+
+  <div class="a4-page">
+    <div class="inner-header">IV. ARTE Y FORMA · HAIKU XIII</div>
+    <div class="content-wrap">
+      <div class="image-container" data-index="12">
+        <img src="image13.jpg" alt="Haiku XIII">
+        <div class="zoom-trigger"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+        <div class="watermark">© Daniel Remeseiro</div>
+      </div>
+      <div class="haiku-content">
+        <div class="haiku-number">HAIKU XIII</div>
+        <div class="haiku-title">El contenedor</div>
+        <div class="haiku-text">El marco fija,<br>la energía se aloja<br>dentro del mapa.</div>
+      </div>
+    </div>
+    <div class="inner-footer">
+      <a href="mailto:dremeseiro@gmail.com">dremeseiro@gmail.com</a> | WhatsApp | <a href="https://www.danielremeseiro.es" target="_blank">www.danielremeseiro.es</a><br>
+      PROYECTO BULD · IMAGINACIÓN ACTIVA · CONTENIDO E INCONSCIENTE · <br>
+      © Daniel Remeseiro · A CORUÑA<br>
+    </div>
+  </div>
+
+  <div class="a4-page">
+    <div class="inner-header">IV. ARTE Y FORMA · HAIKU XIV</div>
+    <div class="content-wrap">
+      <div class="image-container" data-index="13">
+        <img src="image14.jpg" alt="Haiku XIV">
+        <div class="zoom-trigger"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+        <div class="watermark">© Daniel Remeseiro</div>
+      </div>
+      <div class="haiku-content">
+        <div class="haiku-number">HAIKU XIV</div>
+        <div class="haiku-title">Estructura</div>
+        <div class="haiku-text">Rigor y ritmo,<br>la materia sostiene<br>lo inmaterial.</div>
+      </div>
+    </div>
+    <div class="inner-footer">
+      <a href="mailto:dremeseiro@gmail.com">dremeseiro@gmail.com</a> | WhatsApp | <a href="https://www.danielremeseiro.es" target="_blank">www.danielremeseiro.es</a><br>
+      PROYECTO BULD · IMAGINACIÓN ACTIVA · CONTENIDO E INCONSCIENTE · <br>
+      © Daniel Remeseiro · A CORUÑA<br>
+    </div>
+  </div>
+
+  <div class="a4-page">
+    <div class="inner-header">IV. ARTE Y FORMA · HAIKU XV</div>
+    <div class="content-wrap">
+      <div class="image-container" data-index="14">
+        <img src="image15.jpg" alt="Haiku XV">
+        <div class="zoom-trigger"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+        <div class="watermark">© Daniel Remeseiro</div>
+      </div>
+      <div class="haiku-content">
+        <div class="haiku-number">HAIKU XV</div>
+        <div class="haiku-title">La obra en pie</div>
+        <div class="haiku-text">Forma acabada,<br>el mensaje reposa<br>ya hacia fuera.</div>
+      </div>
+    </div>
+    <div class="inner-footer">
+      <a href="mailto:dremeseiro@gmail.com">dremeseiro@gmail.com</a> | WhatsApp | <a href="https://www.danielremeseiro.es" target="_blank">www.danielremeseiro.es</a><br>
+      PROYECTO BULD · IMAGINACIÓN ACTIVA · CONTENIDO E INCONSCIENTE · <br>
+      © Daniel Remeseiro · A CORUÑA<br>
+    </div>
+  </div>
+
+  <div class="a4-page">
+    <div class="inner-header">IV. ARTE Y FORMA · HAIKU XVI</div>
+    <div class="content-wrap">
+      <div class="image-container" data-index="15">
+        <img src="image16.jpg" alt="Haiku XVI">
+        <div class="zoom-trigger"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></div>
+        <div class="watermark">© Daniel Remeseiro</div>
+      </div>
+      <div class="haiku-content">
+        <div class="haiku-number">HAIKU XVI</div>
+        <div class="haiku-title">Integración</div>
+        <div class="haiku-text">La paz habita<br>el espacio creado,<br>sueño encarnado.</div>
+      </div>
+    </div>
+    <div class="inner-footer">
+      <a href="mailto:dremeseiro@gmail.com">dremeseiro@gmail.com</a> | WhatsApp | <a href="https://www.danielremeseiro.es" target="_blank">www.danielremeseiro.es</a><br>
+      PROYECTO BULD · IMAGINACIÓN ACTIVA · CONTENIDO E INCONSCIENTE · <br>
+      © Daniel Remeseiro · A CORUÑA<br>
+    </div>
+  </div>
+
+  <!-- PÁGINA 18: TEXTO CURATORIAL Y FICHA TÉCNICA -->
+  <div class="a4-page">
+    <div>
+      <div class="section-title">TEXTO CURATORIAL</div>
+      <div class="curatorial-text">
+        El Proyecto BULD presenta una exploración metódica de los contenidos que emergen del inconsciente a través del proceso de Imaginación Activa. Organizada en cuatro movimientos conceptuales, la serie transita desde el vaciamiento inicial de la conciencia reflexiva hasta la integración formal de las imágenes emergentes.
+      </div>
+      <div class="curatorial-text">
+        Las 16 obras plásticas dialogan de manera directa con poemas en forma de haiku, ofreciendo un soporte de contención métrica y conceptual a los contenidos simbólicos que brotan del diálogo ético entre la psique y el Yo consciente.
+      </div>
+
+      <div class="section-title">FICHA TÉCNICA Y ESPECIFICACIONES</div>
+      <table class="tech-table">
+        <tr>
+          <td class="tech-label">Título de la serie</td>
+          <td class="tech-value">PROYECTO BULD · POEMAS · IMAGINACIÓN ACTIVA</td>
+        </tr>
+        <tr>
+          <td class="tech-label">Autoría</td>
+          <td class="tech-value">Daniel Remeseiro</td>
+        </tr>
+        <tr>
+          <td class="tech-label">Estructura</td>
+          <td class="tech-value">16 Obras (Haikus I al XVI) distribuidas en 4 bloques temáticos</td>
+        </tr>
+        <tr>
+          <td class="tech-label">Soporte y Técnica</td>
+          <td class="tech-value">Tinta, técnica mixta e impresión fina sobre papel A4</td>
+        </tr>
+        <tr>
+          <td class="tech-label">Año de producción</td>
+          <td class="tech-value">2026</td>
+        </tr>
+        <tr>
+          <td class="tech-label">Lugar de origen</td>
+          <td class="tech-value">A Coruña, Galicia, España</td>
+        </tr>
+      </table>
+    </div>
+
+    <div>
+      <div class="print-btn-container">
+        <button class="print-btn" onclick="window.print()">Imprimir / Guardar PDF</button>
+      </div>
+      <div class="inner-footer">
+        <a href="mailto:dremeseiro@gmail.com">dremeseiro@gmail.com</a> | WhatsApp | <a href="https://www.danielremeseiro.es" target="_blank">www.danielremeseiro.es</a><br>
+        PROYECTO BULD · IMAGINACIÓN ACTIVA · CONTENIDO E INCONSCIENTE · <br>
+        © Daniel Remeseiro · A CORUÑA<br>
+      </div>
+    </div>
+  </div>
+
+  <!-- VISOR MODAL (SINCRONIZADO) -->
+  <div class="modal-viewer" id="modalViewer">
+    <div class="modal-close" id="modalClose">&times;</div>
+    <div class="modal-container">
+      <button class="modal-nav" id="prevBtn">&#10094;</button>
+      <div class="modal-content-box">
+        <img src="" alt="" class="modal-img" id="modalImg">
+        <div class="modal-caption">
+          <div class="modal-haiku-num" id="modalNum">HAIKU I</div>
+          <div class="modal-haiku-title" id="modalTitle">Desocupación</div>
+        </div>
+      </div>
+      <button class="modal-nav" id="nextBtn">&#10095;</button>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const items = [
+        { src: "image1.jpg", num: "HAIKU I", title: "Desocupación" },
+        { src: "image2.jpg", num: "HAIKU II", title: "El canal limpio" },
+        { src: "image3.jpg", num: "HAIKU III", title: "Apertura" },
+        { src: "image4.jpg", num: "HAIKU IV", title: "Disponibilidad" },
+        { src: "image5.jpg", num: "HAIKU V", title: "El primer trazo" },
+        { src: "image6.jpg", num: "HAIKU VI", title: "Surgimiento" },
+        { src: "image7.jpg", num: "HAIKU VII", title: "Sombra activa" },
+        { src: "image8.jpg", num: "HAIKU VIII", title: "Independencia" },
+        { src: "image9.jpg", num: "HAIKU IX", title: "El encuentro" },
+        { src: "image10.jpg", num: "HAIKU X", title: "Presencia" },
+        { src: "image11.jpg", num: "HAIKU XI", title: "Pacto" },
+        { src: "image12.jpg", num: "HAIKU XII", title: "Respeto" },
+        { src: "image13.jpg", num: "HAIKU XIII", title: "El contenedor" },
+        { src: "image14.jpg", num: "HAIKU XIV", title: "Estructura" },
+        { src: "image15.jpg", num: "HAIKU XV", title: "La obra en pie" },
+        { src: "image16.jpg", num: "HAIKU XVI", title: "Integración" }
+      ];
+
+      let currentIndex = 0;
+
+      const modalViewer = document.getElementById("modalViewer");
+      const modalImg = document.getElementById("modalImg");
+      const modalNum = document.getElementById("modalNum");
+      const modalTitle = document.getElementById("modalTitle");
+      const modalClose = document.getElementById("modalClose");
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+
+      function updateModal(index) {
+        currentIndex = index;
+        if (currentIndex < 0) currentIndex = items.length - 1;
+        if (currentIndex >= items.length) currentIndex = 0;
+
+        const item = items[currentIndex];
+        modalImg.src = item.src;
+        modalImg.alt = item.title;
+        modalNum.textContent = item.num;
+        modalTitle.textContent = item.title;
+      }
+
+      function openModal(index) {
+        updateModal(index);
+        modalViewer.classList.add("active");
+      }
+
+      function closeModal() {
+        modalViewer.classList.remove("active");
+      }
+
+      document.querySelectorAll(".image-container").forEach(container => {
+        container.addEventListener("click", () => {
+          const idx = parseInt(container.getAttribute("data-index"), 10);
+          openModal(idx);
+        });
+      });
+
+      modalClose.addEventListener("click", closeModal);
+      
+      prevBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        updateModal(currentIndex - 1);
+      });
+
+      nextBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        updateModal(currentIndex + 1);
+      });
+
+      modalViewer.addEventListener("click", (e) => {
+        if (e.target === modalViewer) closeModal();
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (!modalViewer.classList.contains("active")) return;
+        if (e.key === "Escape") closeModal();
+        if (e.key === "ArrowLeft") updateModal(currentIndex - 1);
+        if (e.key === "ArrowRight") updateModal(currentIndex + 1);
+      });
+    });
+  </script>
+</body>
+</html>
